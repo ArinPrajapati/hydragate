@@ -17,8 +17,7 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", handler)
-	http.Handle("/health", middleware.Logger(http.HandlerFunc(handlerHealth)))
+	http.Handle("/health", middleware.Chain(http.HandlerFunc(handlerHealth), middleware.Logger))
 	fmt.Println("Server is running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
