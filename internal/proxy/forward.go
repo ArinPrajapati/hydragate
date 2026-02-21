@@ -1,23 +1,21 @@
 package proxy
 
 import (
+	"hydragate/internal/urlpath"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func Forward(reg *Registry) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
-		// divide the path in by /
-		first, rest, _ := strings.Cut(strings.TrimPrefix(path, "/"), "/")
-		route, ok := reg.GetRoute(first)
+		parsed, _ := urlpath.Parse(r.URL.Path)
+		route, ok := reg.GetRoute(parsed.Prefix)
 		if !ok {
 			http.Error(w, "Route not found", http.StatusNotFound)
 			return
 		}
 
-		url := route.Target + "/" + rest
+		url := route.Target + "/" + parsed.Path
 
 		sendRequest(w, r, url)
 	}

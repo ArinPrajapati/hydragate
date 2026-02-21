@@ -1,10 +1,19 @@
-[
-    {
-        "route": "api",
-        "target": "http://localhost:9000"
+{
+    "jwt_secret": "my-super-secret-key-change-in-production",
+    "forward_claims": {
+        "sub": "X-User-Id",
+        "role": "X-User-Role"
     },
-    {
-        "route": "date",
-        "target": "http://localhost:9000"
-    }
-]
+    "routes": [
+        {
+            "route": "api",
+            "target": "http://localhost:9000",
+            "protected": true
+        },
+        {
+            "route": "date",
+            "target": "http://localhost:9000",
+            "protected": false
+        }
+    ]
+}

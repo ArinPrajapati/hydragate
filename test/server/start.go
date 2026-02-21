@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"hydragate/test/internal/auth"
 )
 
 func main() {
@@ -20,6 +22,8 @@ func main() {
 		time.Sleep(5 * time.Second)
 		fmt.Fprint(w, time.Now().Format("2006-01-02"))
 	})
+
+	http.HandleFunc("/auth/login", auth.LoginHandler("my-super-secret-key-change-in-production"))
 
 	fmt.Println("Sever Running on http://localhost:9000")
 
