@@ -12,11 +12,12 @@ func main() {
 	})
 
 	http.HandleFunc("/time", func(w http.ResponseWriter, r *http.Request) {
-
+		time.Sleep(5 * time.Second)
 		fmt.Fprint(w, time.Now().Format("15:04:05"))
 	})
 
 	http.HandleFunc("/date", func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(5 * time.Second)
 		fmt.Fprint(w, time.Now().Format("2006-01-02"))
 	})
 

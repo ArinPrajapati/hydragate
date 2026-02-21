@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
-	"github.com/google/uuid" // id generator
+	"github.com/google/uuid"
 )
 
 type statusRecorder struct {
@@ -28,6 +28,13 @@ func Logger(fn http.Handler) http.Handler {
 		}
 		fn.ServeHTTP(sr, req)
 
-		fmt.Printf("[%d] %s %v %s %s\n", sr.statusCode, req.Method, time.Since(start), id, req.URL.Path)
+		slog.Info("request completed",
+			"status", sr.statusCode,
+			"method", req.Method,
+			"path", req.URL.Path,
+			"latency_ms", time.Since(start).Milliseconds(),
+			"request_id", id,
+			"remote_addr", req.RemoteAddr,
+		)
 	})
 }

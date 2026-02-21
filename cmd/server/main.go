@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"hydragate/internal/config"
 	"hydragate/internal/middleware"
@@ -19,6 +21,12 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// Initialize structured JSON logger
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+	slog.SetDefault(logger)
+
 	cfg, err := config.LoadConfig("config.json")
 	if err != nil {
 		log.Fatal(err)
@@ -29,6 +37,6 @@ func main() {
 
 	http.Handle("/health", middleware.Chain(http.HandlerFunc(handlerHealth), middleware.Logger))
 	http.Handle("/", middleware.Chain(http.HandlerFunc(proxy.Forward(reg)), middleware.Logger))
-	fmt.Println("Server is running on http://localhost:8080")
+	slog.Info("server started", "addr", "http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
