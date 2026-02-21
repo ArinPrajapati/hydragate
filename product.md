@@ -185,6 +185,7 @@ Add:
 - circuit breaker
 - metrics (Prometheus)
 - Docker setup
+- API key management (admin REST API + Redis-backed store)
 - optional dashboard
 
 ---

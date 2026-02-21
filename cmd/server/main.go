@@ -36,6 +36,11 @@ func main() {
 		ProtectedRoutes: reg.ProtectedRoutes(),
 	})
 
+	apiKeyAuth := middleware.APIKeyAuth(middleware.APIKeyAuthConfig{
+		Keys:            cfg.APIKeys,
+		ProtectedRoutes: reg.ProtectedRoutes(),
+	})
+
 	http.Handle("/health", middleware.Chain(
 		http.HandlerFunc(handlerHealth),
 		middleware.Logger,
@@ -45,6 +50,7 @@ func main() {
 		http.HandlerFunc(proxy.Forward(reg)),
 		middleware.Logger,
 		jwtAuth,
+		apiKeyAuth,
 	))
 
 	slog.Info("server started", "addr", "http://localhost:8080")

@@ -4,6 +4,10 @@
         "sub": "X-User-Id",
         "role": "X-User-Role"
     },
+    "api_keys": {
+        "test-key-1": "dev-client",
+        "test-key-2": "mobile-app"
+    },
     "routes": [
         {
             "route": "api",

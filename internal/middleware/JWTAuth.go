@@ -31,6 +31,12 @@ func JWTAuth(cfg JWTAuthConfig) func(http.Handler) http.Handler {
 				return
 			}
 
+			// skip
+			if r.Header.Get("X-Authenticated-By") == "api-key" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				writeAuthError(w, http.StatusUnauthorized, "missing authorization header")

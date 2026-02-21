@@ -9,5 +9,6 @@ type RouteConfig struct {
 type GatewayConfig struct {
 	JWTSecret     string            `json:"jwt_secret"`
 	ForwardClaims map[string]string `json:"forward_claims"`
+	APIKeys       map[string]string `json:"api_keys"` // later API will hanlded from dashbaord intead of config file
 	Routes        []RouteConfig     `json:"routes"`
 }
