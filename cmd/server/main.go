@@ -21,7 +21,6 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Initialize structured JSON logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
