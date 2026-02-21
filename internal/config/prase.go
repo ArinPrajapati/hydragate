@@ -14,14 +14,14 @@ type Config struct {
 func ParseConfig(FilePath string) ([]Config, error) {
 	data, err := os.ReadFile(FilePath)
 	if err != nil {
-		fmt.Errorf("Error reading config file:", err)
+		return nil, fmt.Errorf("Error reading config file:", err)
 	}
 
 	var routes []Config
 
 	err = json.Unmarshal(data, &routes)
 	if err != nil {
-		fmt.Errorf("Error Unmarshalling config file:", err)
+		return nil, fmt.Errorf("Error Unmarshalling config file:", err)
 	}
 
 	return routes, nil
