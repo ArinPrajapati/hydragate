@@ -3,18 +3,14 @@ package config
 import (
 	"fmt"
 
-	"hydragate/internal/proxy"
+	"hydragate/internal/app"
 )
 
-func LoadConfig(path string, reg *proxy.Registry) error {
+func LoadConfig(path string) ([]app.RouteConfig, error) {
 	config, err := ParseConfig(path)
 	if err != nil {
-		return fmt.Errorf("failed to parse config: %w", err)
+		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	for _, r := range config {
-		reg.AddRoute(r.Route, r.Target)
-	}
-
-	return nil
+	return config, nil
 }

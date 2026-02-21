@@ -1,6 +1,10 @@
 package proxy
 
-import "fmt"
+import (
+	"fmt"
+
+	"hydragate/internal/app"
+)
 
 type Routing struct {
 	id     string
@@ -27,4 +31,10 @@ func (r *Registry) AddRoute(pathPrefix string, target string) {
 func (r *Registry) GetRoute(pathPrefix string) (Routing, bool) {
 	route, ok := r.Routes[pathPrefix]
 	return route, ok
+}
+
+func (r *Registry) LoadRoutes(configs []app.RouteConfig) {
+	for _, c := range configs {
+		r.AddRoute(c.Route, c.Target)
+	}
 }

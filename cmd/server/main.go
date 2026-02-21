@@ -19,11 +19,14 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	reg := proxy.NewRegistry()
-	err := config.LoadConfig("config.json", reg)
+	cfg, err := config.LoadConfig("config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	reg := proxy.NewRegistry()
+	reg.LoadRoutes(cfg)
+
 	http.Handle("/health", middleware.Chain(http.HandlerFunc(handlerHealth), middleware.Logger))
 	http.Handle("/", middleware.Chain(http.HandlerFunc(proxy.Forward(reg)), middleware.Logger))
 	fmt.Println("Server is running on http://localhost:8080")

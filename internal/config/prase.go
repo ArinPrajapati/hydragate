@@ -4,20 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"hydragate/internal/app"
 )
 
-type Config struct {
-	Route  string `json:"route"`
-	Target string `json:"target"`
-}
-
-func ParseConfig(FilePath string) ([]Config, error) {
+func ParseConfig(FilePath string) ([]app.RouteConfig, error) {
 	data, err := os.ReadFile(FilePath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading config file:", err)
 	}
 
-	var routes []Config
+	var routes []app.RouteConfig
 
 	err = json.Unmarshal(data, &routes)
 	if err != nil {
