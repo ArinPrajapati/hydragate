@@ -1,0 +1,10 @@
+[
+    {
+        "route": "api",
+        "target": "http://localhost:9000"
+    },
+    {
+        "route": "date",
+        "target": "http://localhost:9000"
+    }
+]

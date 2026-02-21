@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"hydragate/internal/config"
 	"hydragate/internal/middleware"
 	"hydragate/internal/proxy"
 )
@@ -19,7 +20,10 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	reg := proxy.NewRegistry()
-	reg.AddRoute("api", "http://localhost:9000")
+	err := config.LoadConfig("config.json", reg)
+	if err != nil {
+		log.Fatal(err)
+	}
 	http.Handle("/health", middleware.Chain(http.HandlerFunc(handlerHealth), middleware.Logger))
 	http.Handle("/", middleware.Chain(http.HandlerFunc(proxy.Forward(reg)), middleware.Logger))
 	fmt.Println("Server is running on http://localhost:8080")

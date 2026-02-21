@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -12,6 +13,8 @@ func Forward(reg *Registry) func(http.ResponseWriter, *http.Request) {
 		// divide the path in by /
 		first, rest, _ := strings.Cut(strings.TrimPrefix(path, "/"), "/")
 		route, ok := reg.GetRoute(first)
+		fmt.Println("Route: ", route)
+		fmt.Println("OK: ", ok)
 		if !ok {
 			http.Error(w, "Route not found", http.StatusNotFound)
 			return
