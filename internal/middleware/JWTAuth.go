@@ -20,7 +20,11 @@ type JWTAuthConfig struct {
 func JWTAuth(cfg JWTAuthConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			parsed, _ := urlpath.Parse(r.URL.Path)
+			parsed, err := urlpath.Parse(r.URL.Path)
+			if err != nil {
+				writeAuthError(w, http.StatusBadRequest, "invalid request path")
+				return
+			}
 
 			if !cfg.ProtectedRoutes[parsed.Prefix] {
 				next.ServeHTTP(w, r)

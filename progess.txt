@@ -4,3 +4,4 @@ Created Chain        : done
 Created Proxy        : done
 Created file based Config: done
 Created Logger       : done 
+Created JWT Auth     : done

@@ -1,14 +1,26 @@
 package proxy
 
 import (
+	"fmt"
 	"hydragate/internal/urlpath"
 	"io"
 	"net/http"
+	"time"
 )
+
+// TODO: we will later allow user configur this part with config file with defaults if not specified
+var proxyClient = &http.Client{
+	Timeout: 30 * time.Second,
+}
 
 func Forward(reg *Registry) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		parsed, _ := urlpath.Parse(r.URL.Path)
+		parsed, err := urlpath.Parse(r.URL.Path)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Bad request path: %v", err), http.StatusBadRequest)
+			return
+		}
+
 		route, ok := reg.GetRoute(parsed.Prefix)
 		if !ok {
 			http.Error(w, "Route not found", http.StatusNotFound)
@@ -16,6 +28,9 @@ func Forward(reg *Registry) func(http.ResponseWriter, *http.Request) {
 		}
 
 		url := route.Target + "/" + parsed.Path
+		if parsed.Query != "" {
+			url = url + "?" + parsed.Query
+		}
 
 		sendRequest(w, r, url)
 	}
@@ -30,8 +45,7 @@ func sendRequest(w http.ResponseWriter, r *http.Request, url string) {
 
 	req.Header = r.Header.Clone()
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := proxyClient.Do(req)
 	if err != nil {
 		http.Error(w, "Failed to send request", http.StatusInternalServerError)
 		return

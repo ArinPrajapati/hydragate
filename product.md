@@ -18,11 +18,11 @@ HydraGate becomes the **single entry point** for all APIs.
 
 This is how real companies design systems:
 
-* Netflix
-* Stripe
-* Uber
-* Swiggy
-* AWS
+- Netflix
+- Stripe
+- Uber
+- Swiggy
+- AWS
 
 All use API gateways.
 
@@ -47,9 +47,9 @@ Example:
 
 Verify incoming requests:
 
-* JWT tokens
-* API keys
-* protected routes
+- JWT tokens
+- API keys
+- protected routes
 
 ---
 
@@ -59,9 +59,9 @@ Prevent abuse.
 
 Example:
 
-* 100 requests/min per user
-* Uses Redis
-* Token bucket system
+- 100 requests/min per user
+- Uses Redis
+- Token bucket system
 
 ---
 
@@ -71,9 +71,9 @@ Cache responses for faster performance.
 
 Example:
 
-* cache GET requests
-* reduce backend load
-* Redis caching
+- cache GET requests
+- reduce backend load
+- Redis caching
 
 ---
 
@@ -81,10 +81,10 @@ Example:
 
 Track everything:
 
-* request logs
-* latency
-* errors
-* usage
+- request logs
+- latency
+- errors
+- usage
 
 ---
 
@@ -92,9 +92,9 @@ Track everything:
 
 Modify requests before sending to backend:
 
-* add headers
-* remove headers
-* rewrite paths
+- add headers
+- remove headers
+- rewrite paths
 
 ---
 
@@ -104,9 +104,9 @@ Allow custom middleware plugins.
 
 Example:
 
-* add auth plugin
-* add logging plugin
-* add analytics plugin
+- add auth plugin
+- add logging plugin
+- add analytics plugin
 
 Like Kong plugins.
 
@@ -116,10 +116,10 @@ Like Kong plugins.
 
 Simple UI to:
 
-* view logs
-* view routes
-* monitor usage
-* manage keys
+- view logs
+- view routes
+- monitor usage
+- manage keys
 
 ---
 
@@ -150,11 +150,11 @@ Goal: basic gateway working
 
 Features:
 
-* HTTP server in Go
-* middleware system
-* reverse proxy
-* route config
-* request logging
+- HTTP server in Go
+- middleware system
+- reverse proxy
+- route config
+- request logging
 
 ---
 
@@ -164,12 +164,12 @@ Goal: real backend engineering
 
 Add:
 
-* JWT authentication
-* API key system
-* rate limiting (Redis)
-* structured logging
-* request transform
-* config reload
+- JWT authentication
+- API key system
+- rate limiting (Redis)
+- structured logging
+- request transform
+- config reload
 
 ---
 
@@ -179,23 +179,12 @@ Goal: elite backend project
 
 Add:
 
-* caching (Redis)
-* plugin system
-* load balancing
-* circuit breaker
-* metrics (Prometheus)
-* Docker setup
-* optional dashboard
----
-
-# 🏁 Final Outcome
-
-After completion you will have:
-
-* Advanced Go backend skills
-* Middleware architecture understanding
-* System design knowledge
-* Redis + infra experience
-* Production-style repo
+- caching (Redis)
+- plugin system
+- load balancing
+- circuit breaker
+- metrics (Prometheus)
+- Docker setup
+- optional dashboard
 
 ---
