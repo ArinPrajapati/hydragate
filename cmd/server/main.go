@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
@@ -10,6 +11,8 @@ import (
 	"hydragate/internal/config"
 	"hydragate/internal/middleware"
 	"hydragate/internal/proxy"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func handlerHealth(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +30,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+	if err := rdb.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("failed to connect to redis: %v", err)
+	}
+	slog.Info("connected to redis")
+
 	reg := proxy.NewRegistry()
 	reg.LoadRoutes(cfg.Routes)
 
@@ -41,6 +52,8 @@ func main() {
 		ProtectedRoutes: reg.ProtectedRoutes(),
 	})
 
+	rateLimiter := middleware.RateLimiter(rdb, cfg.RateLimit)
+
 	http.Handle("/health", middleware.Chain(
 		http.HandlerFunc(handlerHealth),
 		middleware.Logger,
@@ -49,6 +62,7 @@ func main() {
 	http.Handle("/", middleware.Chain(
 		http.HandlerFunc(proxy.Forward(reg)),
 		middleware.Logger,
+		rateLimiter,
 		jwtAuth,
 		apiKeyAuth,
 	))

@@ -8,6 +8,11 @@
         "test-key-1": "dev-client",
         "test-key-2": "mobile-app"
     },
+    "rate_limit": {
+        "enabled": true,
+        "capacity": 100,
+        "refill_rate": 100
+    },
     "routes": [
         {
             "route": "api",
