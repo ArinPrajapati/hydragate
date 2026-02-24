@@ -2,9 +2,11 @@ package proxy
 
 import (
 	"fmt"
+	"hydragate/internal/app"
 	"hydragate/internal/urlpath"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -27,16 +29,25 @@ func Forward(reg *Registry) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		url := route.Target + "/" + parsed.Path
+		path := parsed.Path
+		if route.Transform.PathRewrite != "" {
+			path = route.Transform.PathRewrite
+			// Simple wildcard appending if original path had a trailing segment
+			if strings.HasSuffix(route.Transform.PathRewrite, "*") {
+				path = strings.TrimSuffix(route.Transform.PathRewrite, "*") + parsed.Path
+			}
+		}
+
+		url := route.Target + "/" + path
 		if parsed.Query != "" {
 			url = url + "?" + parsed.Query
 		}
 
-		sendRequest(w, r, url)
+		sendRequest(w, r, url, route.Transform)
 	}
 }
 
-func sendRequest(w http.ResponseWriter, r *http.Request, url string) {
+func sendRequest(w http.ResponseWriter, r *http.Request, url string, transform app.TransformConfig) {
 	req, err := http.NewRequest(r.Method, url, r.Body)
 	if err != nil {
 		http.Error(w, "Failed to create request", http.StatusInternalServerError)
@@ -44,6 +55,13 @@ func sendRequest(w http.ResponseWriter, r *http.Request, url string) {
 	}
 
 	req.Header = r.Header.Clone()
+
+	for k, v := range transform.AddHeaders {
+		req.Header.Set(k, v)
+	}
+	for _, k := range transform.RemoveHeaders {
+		req.Header.Del(k)
+	}
 
 	resp, err := proxyClient.Do(req)
 	if err != nil {

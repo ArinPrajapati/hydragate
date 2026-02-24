@@ -17,7 +17,17 @@
         {
             "route": "api",
             "target": "http://localhost:9000",
-            "protected": true
+            "protected": true,
+            "transform": {
+                "add_headers": {
+                    "X-Proxied-By": "HydraGate",
+                    "X-Rate-Limit-Config": "true"
+                },
+                "remove_headers": [
+                    "User-Agent"
+                ],
+                "path_rewrite": "backend/api/*"
+            }
         },
         {
             "route": "date",

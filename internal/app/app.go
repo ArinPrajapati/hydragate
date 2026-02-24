@@ -1,9 +1,16 @@
 package app
 
+type TransformConfig struct {
+	AddHeaders    map[string]string `json:"add_headers,omitempty"`
+	RemoveHeaders []string          `json:"remove_headers,omitempty"`
+	PathRewrite   string            `json:"path_rewrite,omitempty"`
+}
+
 type RouteConfig struct {
-	Route     string `json:"route"`
-	Target    string `json:"target"`
-	Protected bool   `json:"protected"`
+	Route     string          `json:"route"`
+	Target    string          `json:"target"`
+	Protected bool            `json:"protected"`
+	Transform TransformConfig `json:"transform"`
 }
 
 type RateLimitConfig struct {

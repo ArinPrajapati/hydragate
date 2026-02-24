@@ -10,6 +10,7 @@ type Routing struct {
 	id        string
 	Target    string
 	Protected bool
+	Transform app.TransformConfig
 }
 
 type Registry struct {
@@ -22,11 +23,12 @@ func NewRegistry() *Registry {
 	}
 }
 
-func (r *Registry) AddRoute(pathPrefix string, target string, protected bool) {
+func (r *Registry) AddRoute(pathPrefix string, target string, protected bool, transform app.TransformConfig) {
 	r.Routes[pathPrefix] = Routing{
 		id:        fmt.Sprintf("%d", len(r.Routes)+1),
 		Target:    target,
 		Protected: protected,
+		Transform: transform,
 	}
 }
 
@@ -37,7 +39,7 @@ func (r *Registry) GetRoute(pathPrefix string) (Routing, bool) {
 
 func (r *Registry) LoadRoutes(configs []app.RouteConfig) {
 	for _, c := range configs {
-		r.AddRoute(c.Route, c.Target, c.Protected)
+		r.AddRoute(c.Route, c.Target, c.Protected, c.Transform)
 	}
 }
 
