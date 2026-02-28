@@ -11,6 +11,8 @@ type Routing struct {
 	Target    string
 	Protected bool
 	Transform app.TransformConfig
+	Cache     *app.RouteCacheConfig
+	CachePaths []app.CachePathOverride
 }
 
 type Registry struct {
@@ -24,11 +26,17 @@ func NewRegistry() *Registry {
 }
 
 func (r *Registry) AddRoute(pathPrefix string, target string, protected bool, transform app.TransformConfig) {
+	r.AddRouteWithCache(pathPrefix, target, protected, transform, nil, nil)
+}
+
+func (r *Registry) AddRouteWithCache(pathPrefix string, target string, protected bool, transform app.TransformConfig, cache *app.RouteCacheConfig, cachePaths []app.CachePathOverride) {
 	r.Routes[pathPrefix] = Routing{
-		id:        fmt.Sprintf("%d", len(r.Routes)+1),
-		Target:    target,
-		Protected: protected,
-		Transform: transform,
+		id:         fmt.Sprintf("%d", len(r.Routes)+1),
+		Target:     target,
+		Protected:  protected,
+		Transform:  transform,
+		Cache:      cache,
+		CachePaths: cachePaths,
 	}
 }
 
@@ -39,7 +47,7 @@ func (r *Registry) GetRoute(pathPrefix string) (Routing, bool) {
 
 func (r *Registry) LoadRoutes(configs []app.RouteConfig) {
 	for _, c := range configs {
-		r.AddRoute(c.Route, c.Target, c.Protected, c.Transform)
+		r.AddRouteWithCache(c.Route, c.Target, c.Protected, c.Transform, c.Cache, c.CachePaths)
 	}
 }
 

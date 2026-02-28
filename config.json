@@ -24,7 +24,7 @@
           "X-Rate-Limit-Config": "true"
         },
         "remove_headers": ["User-Agent"],
-        "path_rewrite": "*" // we can use this to rewrite the path
+        "path_rewrite": "*"
       }
     },
     {

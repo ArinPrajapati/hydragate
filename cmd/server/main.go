@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 
+	"hydragate/internal/app"
+	"hydragate/internal/cache"
 	"hydragate/internal/config"
 	"hydragate/internal/middleware"
 	"hydragate/internal/proxy"
@@ -61,12 +63,28 @@ func buildMainHandler(rdb *redis.Client, state *config.State) http.Handler {
 
 	rateLimiter := middleware.RateLimiter(rdb, cfg.RateLimit)
 
+	// Create a function to get route config by prefix
+	getRouteFunc := func(prefix string) (app.RouteConfig, bool) {
+		route, found := reg.GetRoute(prefix)
+		return app.RouteConfig{
+			Route:      prefix,
+			Target:     route.Target,
+			Protected:  route.Protected,
+			Transform:  route.Transform,
+			Cache:      route.Cache,
+			CachePaths: route.CachePaths,
+		}, found
+	}
+
+	cacheMiddleware := cache.Cache(rdb, cfg, getRouteFunc)
+
 	return middleware.Chain(
 		http.HandlerFunc(proxy.Forward(reg)),
 		middleware.Logger,
 		rateLimiter,
 		jwtAuth,
 		apiKeyAuth,
+		cacheMiddleware,
 	)
 }
 
@@ -75,13 +93,14 @@ var mainHandler http.Handler
 func main() {
 
 	reddisAddr := "localhost:6379"
+	config_path := "config.json"
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
 
-	cfg, err := config.LoadConfig("config.json")
+	cfg, err := config.LoadConfig(config_path)
 	if err != nil {
 		log.Fatal(err)
 	}

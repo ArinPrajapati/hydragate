@@ -25,9 +25,9 @@ if tokens >= requested then
     tokens = tokens - requested
     redis.call("HMSET", key, "tokens", tokens, "last_refill", last_refill)
     redis.call("EXPIRE", key, 300) -- expire after 5 mins inactivity
-    return 1 -- allowed
+    return 1                       -- allowed
 else
-	redis.call("HMSET", key, "tokens", tokens, "last_refill", last_refill)
+    redis.call("HMSET", key, "tokens", tokens, "last_refill", last_refill)
     redis.call("EXPIRE", key, 300)
     return 0 -- rejected
 end

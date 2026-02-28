@@ -1,9 +1,9 @@
 Created Basic Server : done
 Created Middleware   : done
-Created Chain        : done 
+Created Chain        : done
 Created Proxy        : done
 Created file based Config: done
-Created Logger       : done 
+Created Logger       : done
 Created JWT Auth     : done
 Created API Key Auth : done
 Created Rate Limiter : done
