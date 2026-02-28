@@ -1,38 +1,36 @@
 {
-    "jwt_secret": "my-super-secret-key-change-in-production",
-    "forward_claims": {
-        "sub": "X-User-Id",
-        "role": "X-User-Role"
-    },
-    "api_keys": {
-        "test-key-1": "dev-client",
-        "test-key-2": "mobile-app"
-    },
-    "rate_limit": {
-        "enabled": true,
-        "capacity": 100,
-        "refill_rate": 100
-    },
-    "routes": [
-        {
-            "route": "api",
-            "target": "http://localhost:9000",
-            "protected": true,
-            "transform": {
-                "add_headers": {
-                    "X-Proxied-By": "HydraGate",
-                    "X-Rate-Limit-Config": "true"
-                },
-                "remove_headers": [
-                    "User-Agent"
-                ],
-                "path_rewrite": "backend/api/*"
-            }
+  "jwt_secret": "update",
+  "forward_claims": {
+    "sub": "X-User-Id",
+    "role": "X-User-Role"
+  },
+  "api_keys": {
+    "test-key-1": "dev-client",
+    "test-key-2": "mobile-app"
+  },
+  "rate_limit": {
+    "enabled": true,
+    "capacity": 100,
+    "refill_rate": 100
+  },
+  "routes": [
+    {
+      "route": "api",
+      "target": "http://localhost:9000",
+      "protected": true,
+      "transform": {
+        "add_headers": {
+          "X-Proxied-By": "HydraGate",
+          "X-Rate-Limit-Config": "true"
         },
-        {
-            "route": "date",
-            "target": "http://localhost:9000",
-            "protected": false
-        }
-    ]
+        "remove_headers": ["User-Agent"],
+        "path_rewrite": "*" // we can use this to rewrite the path
+      }
+    },
+    {
+      "route": "date",
+      "target": "http://localhost:9000",
+      "protected": false
+    }
+  ]
 }

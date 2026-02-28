@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"hydragate/internal/auth"
@@ -30,6 +31,7 @@ var demoUsers = map[string]struct {
 
 func LoginHandler(secret string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("headers", r.Header)
 		if r.Method != http.MethodPost {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusMethodNotAllowed)

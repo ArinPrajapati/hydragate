@@ -22,6 +22,19 @@ Client → HydraGate → Backend Services
 
 ---
 
+## Current Status — Phase 2: Production Features ✅
+
+| Component                 | Status  |
+| ------------------------- | ------- |
+| JWT authentication        | ✅ Done |
+| API key authentication    | ✅ Done |
+| Rate limiting (Redis)      | ✅ Done |
+| Structured logging        | ✅ Done |
+| Request transform         | ✅ Done |
+| Config reload              | ✅ Done |
+
+---
+
 ## Project Structure
 
 ```
@@ -62,6 +75,23 @@ reg.AddRoute("api", "http://localhost:9000")
 GET /health → "Alive"
 ```
 
+### Config Reload
+
+HydraGate supports hot-reloading of the configuration without server restart:
+
+**Automatic reload:** Changes to `config.json` are automatically detected and applied.
+
+**Manual reload:** Trigger via HTTP endpoint:
+```bash
+curl -X POST http://localhost:8080/reload
+```
+
+**Reload behavior:**
+- Thread-safe atomic config swap (no request downtime)
+- Validates new config before applying
+- Updates all middleware (JWT auth, API keys, rate limiting, routes)
+- Logs reload events
+
 ---
 
 ## Run
@@ -76,12 +106,12 @@ go run ./cmd/server
 
 ### 🟡 Phase 2 — Production Features
 
-- JWT authentication
-- API key system
-- Rate limiting (Redis)
-- Structured logging
-- Request/response transform
-- Config hot-reload
+- JWT authentication ✅
+- API key system ✅
+- Rate limiting (Redis) ✅
+- Structured logging ✅
+- Request/response transform ✅
+- Config hot-reload ✅
 
 ### 🔴 Phase 3 — Pro / Infra Level
 

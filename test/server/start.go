@@ -9,6 +9,9 @@ import (
 )
 
 func main() {
+
+	const jwtSecret = "update"
+
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "OK")
 	})
@@ -23,7 +26,7 @@ func main() {
 		fmt.Fprint(w, time.Now().Format("2006-01-02"))
 	})
 
-	http.HandleFunc("/auth/login", auth.LoginHandler("my-super-secret-key-change-in-production"))
+	http.HandleFunc("/auth/login", auth.LoginHandler(jwtSecret))
 
 	fmt.Println("Sever Running on http://localhost:9000")
 

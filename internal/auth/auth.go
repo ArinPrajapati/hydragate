@@ -39,6 +39,5 @@ func ValidateToken(tokenString string, secret string) (jwt.MapClaims, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid token claims")
 	}
-
 	return claims, nil
 }

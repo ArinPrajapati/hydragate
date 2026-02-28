@@ -22,7 +22,7 @@ type RateLimitConfig struct {
 type GatewayConfig struct {
 	JWTSecret     string            `json:"jwt_secret"`
 	ForwardClaims map[string]string `json:"forward_claims"`
-	APIKeys       map[string]string `json:"api_keys"` // later API will hanlded from dashbaord intead of config file
+	APIKeys       map[string]string `json:"api_keys"`
 	RateLimit     RateLimitConfig   `json:"rate_limit"`
 	Routes        []RouteConfig     `json:"routes"`
 }
