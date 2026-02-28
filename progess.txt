@@ -8,3 +8,4 @@ Created JWT Auth     : done
 Created API Key Auth : done
 Created Rate Limiter : done
 Created Config Reload: done
+Created Redis Cache  : done

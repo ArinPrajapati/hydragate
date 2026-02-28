@@ -156,6 +156,49 @@ func TestResolveCacheConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "path override with empty headers array overrides global headers",
+			path: "/api/products",
+			route: &app.RouteConfig{
+				Route: "api",
+				Cache: &app.RouteCacheConfig{
+					Enabled: boolPtr(true),
+					TTL:     300,
+				},
+				CachePaths: []app.CachePathOverride{
+					{
+						Path: "/products",
+						TTL:  600, // Override TTL too
+						Key: &app.CacheKeyConfig{
+							IncludeHeaders: []string{}, // Empty array should override global
+						},
+					},
+				},
+			},
+			global: &app.GlobalCacheConfig{
+				Enabled:     true,
+				DefaultTTL:  300,
+				Methods:     []string{"GET"},
+				StatusCodes: []int{200},
+				Key: app.CacheKeyConfig{
+					IncludeQuery:        false,
+					IncludeHeaders:      []string{"Accept", "Accept-Language"}, // Global has headers
+					RespectCacheControl: true,
+				},
+				MaxSize: 1024 * 1024,
+			},
+			expected: ResolvedCacheConfig{
+				Enabled:             true,
+				TTL:                 600, // Path-level TTL
+				Methods:             []string{"GET"},
+				StatusCodes:         []int{200},
+				IncludeQuery:        false,
+				IncludeHeaders:      []string{}, // Path-level empty array should override
+				RespectCacheControl: true,
+				ETagValidation:      false,
+				MaxSize:             1024 * 1024,
+			},
+		},
+		{
 			name: "exact path override with nested path",
 			path: "/api/products",
 			route: &app.RouteConfig{

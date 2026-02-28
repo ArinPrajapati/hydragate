@@ -8,6 +8,8 @@ HydraGate sits between clients and backend services, acting as the single entry 
 Client → HydraGate → Backend Services
 ```
 
+**Project Progress:** Phase 1 ✅ | Phase 2 ✅ | Phase 3.1 ✅ | Phase 3.2 🔜
+
 ---
 
 ## Current Status — Phase 1: Core Gateway Foundation ✅
@@ -35,21 +37,54 @@ Client → HydraGate → Backend Services
 
 ---
 
+## Current Status — Phase 3.1: Caching (Redis) ✅
+
+| Component                 | Status  |
+| ------------------------- | ------- |
+| Redis caching middleware   | ✅ Done |
+| Cache key generation      | ✅ Done |
+| Cache configuration       | ✅ Done |
+| Per-route cache control   | ✅ Done |
+
+---
+
 ## Project Structure
 
 ```
 hydragate/
 ├── cmd/
 │   └── server/
-│       └── main.go          # Entry point, route config
+│       └── main.go          # Entry point, middleware chain, server setup
 ├── internal/
+│   ├── app/
+│   │   └── app.go           # Application types (RouteConfig, CacheConfig)
+│   ├── auth/
+│   │   └── auth.go          # JWT claim extraction utilities
+│   ├── cache/
+│   │   ├── config.go        # Cache configuration types
+│   │   ├── key.go           # Cache key generation
+│   │   ├── middleware.go    # Redis cache middleware
+│   │   └── redis.go         # Redis client wrapper
+│   ├── config/
+│   │   ├── loader.go        # Config file loader (JSON)
+│   │   ├── state.go         # Thread-safe config state
+│   │   ├── watcher.go       # File watcher for hot-reload
+│   │   └── reload.go        # Reload validation and swap
 │   ├── middleware/
 │   │   ├── Chain.go         # Middleware chaining
-│   │   └── Logger.go        # Request logger (method, status, latency, UUID)
-│   └── proxy/
-│       ├── registry.go      # Route registry (prefix → target URL)
-│       └── forward.go       # Reverse proxy logic
-└── product.md               # Full feature roadmap
+│   │   ├── Logger.go        # Request logger (method, status, latency, UUID)
+│   │   ├── JWTAuth.go       # JWT authentication
+│   │   ├── APIKeyAuth.go    # API key authentication
+│   │   └── RateLimiter.go   # Rate limiting with Redis
+│   ├── proxy/
+│   │   ├── registry.go      # Route registry (prefix → target URL)
+│   │   └── forward.go       # Reverse proxy logic
+│   └── urlpath/
+│       └── urlpath.go       # URL path utilities
+├── config.json              # Configuration file
+├── docker-compose.yml       # Redis container setup
+├── product.md               # Full feature roadmap
+└── progess.txt              # Development progress log
 ```
 
 ---
@@ -57,16 +92,27 @@ hydragate/
 ## How It Works
 
 1. **Server** starts on `:8080` and registers routes.
-2. Every request passes through the **middleware chain** (Logger → handler).
+2. Every request passes through the **middleware chain** (Logger → RateLimiter → JWTAuth → APIKeyAuth → Cache → Proxy).
 3. The **proxy** resolves the request's path prefix against the route registry and forwards it to the correct backend.
 4. **Logger** captures method, status code, latency, and a unique request ID (UUID) for every request.
+5. **Cache** stores GET responses in Redis for configured routes to reduce backend load.
 
-### Example routing config (in `main.go`)
+### Example routing config (in `config.json`)
 
-```go
-reg := proxy.NewRegistry()
-reg.AddRoute("api", "http://localhost:9000")
-// GET /api/users → http://localhost:9000/users
+```json
+{
+  "routes": [
+    {
+      "prefix": "api",
+      "target": "http://localhost:9000",
+      "protected": true,
+      "cache": {
+        "enabled": true,
+        "ttl": 300
+      }
+    }
+  ]
+}
 ```
 
 ### Health check
@@ -89,22 +135,106 @@ curl -X POST http://localhost:8080/reload
 **Reload behavior:**
 - Thread-safe atomic config swap (no request downtime)
 - Validates new config before applying
-- Updates all middleware (JWT auth, API keys, rate limiting, routes)
+- Updates all middleware (JWT auth, API keys, rate limiting, routes, cache)
 - Logs reload events
+
+### Caching
+
+HydraGate supports Redis-backed response caching:
+
+**Per-route cache control:** Enable/disable caching per route in config
+**TTL support:** Configure cache expiration time per route
+**Smart key generation:** Cache keys include method, path, and query parameters
+**Cache middleware:** Automatically checks cache before proxying requests
+
+**Example cached route:**
+```json
+{
+  "prefix": "users",
+  "target": "http://users-service:8001",
+  "cache": {
+    "enabled": true,
+    "ttl": 300
+  }
+}
+```
+
+## Configuration
+
+HydraGate uses `config.json` for all configuration:
+
+```json
+{
+  "jwt_secret": "your-secret-key",
+  "api_keys": ["key1", "key2"],
+  "rate_limit": {
+    "requests_per_minute": 100,
+    "window_minutes": 1
+  },
+  "forward_claims": ["user_id", "role"],
+  "routes": [
+    {
+      "prefix": "api",
+      "target": "http://localhost:9000",
+      "protected": true,
+      "transform": {
+        "add_headers": {"X-Gateway": "HydraGate"},
+        "remove_headers": ["X-Internal"]
+      },
+      "cache": {
+        "enabled": true,
+        "ttl": 300
+      }
+    }
+  ]
+}
+```
+
+**Configuration options:**
+- `jwt_secret`: Secret key for JWT token validation
+- `api_keys`: List of valid API keys
+- `rate_limit`: Rate limiting configuration
+- `forward_claims`: JWT claims to forward to backend
+- `routes`: List of route definitions
+  - `prefix`: URL path prefix
+  - `target`: Backend service URL
+  - `protected`: Require authentication (true/false)
+  - `transform`: Request/response transformations
+  - `cache`: Cache configuration
 
 ---
 
 ## Run
 
+**Prerequisites:**
+- Go 1.21+
+- Redis (running on localhost:6379)
+
+**Start Redis:**
+```bash
+docker-compose up -d
+```
+
+**Run HydraGate:**
 ```bash
 go run ./cmd/server
 ```
+
+Server will start on `http://localhost:8080`
 
 ---
 
 ## Roadmap
 
-### 🟡 Phase 2 — Production Features
+### 🟢 Phase 1 — Core Gateway Foundation ✅
+
+- HTTP server ✅
+- Middleware system ✅
+- Reverse proxy ✅
+- Route registry ✅
+- Request logging ✅
+
+### 🟢 Phase 2 — Production Features ✅
 
 - JWT authentication ✅
 - API key system ✅
@@ -113,12 +243,18 @@ go run ./cmd/server
 - Request/response transform ✅
 - Config hot-reload ✅
 
-### 🔴 Phase 3 — Pro / Infra Level
+### 🟢 Phase 3.1 — Caching (Redis) ✅
 
-- Caching (Redis)
+- Redis caching middleware ✅
+- Per-route cache control ✅
+- Cache key generation ✅
+- Docker setup (Redis) ✅
+
+### 🔴 Phase 3.2 — Advanced Features 🔜
+
 - Plugin system
 - Load balancing
 - Circuit breaker
 - Prometheus metrics
-- Docker setup
+- API key management (admin REST API)
 - Optional dashboard

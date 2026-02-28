@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -16,7 +15,6 @@ type APIKeyAuthConfig struct {
 func APIKeyAuth(cfg APIKeyAuthConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println("APIKeyAuth")
 			parsed, err := urlpath.Parse(r.URL.Path)
 			if err != nil {
 				writeAuthError(w, http.StatusBadRequest, "invalid request path")

@@ -104,9 +104,7 @@ func applyPathCacheConfig(config *ResolvedCacheConfig, pathOverride *app.CachePa
 		if pathOverride.Key.IncludeQuery {
 			config.IncludeQuery = pathOverride.Key.IncludeQuery
 		}
-		if len(pathOverride.Key.IncludeHeaders) > 0 {
-			config.IncludeHeaders = pathOverride.Key.IncludeHeaders
-		}
+		config.IncludeHeaders = pathOverride.Key.IncludeHeaders
 		if pathOverride.Key.RespectCacheControl {
 			config.RespectCacheControl = pathOverride.Key.RespectCacheControl
 		}
