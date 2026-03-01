@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 
 	"hydragate/internal/app"
@@ -17,6 +18,11 @@ import (
 var rateLimitLua string
 
 var tokenBucketScript = redis.NewScript(rateLimitLua)
+
+var (
+	rateLimitWarnTime sync.Mutex
+	rateLimitLastWarn time.Time
+)
 
 func RateLimiter(rdb *redis.Client, cfg app.RateLimitConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
