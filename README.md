@@ -258,3 +258,27 @@ Server will start on `http://localhost:8080`
 - Prometheus metrics
 - API key management (admin REST API)
 - Optional dashboard
+
+## 📋 Future Development Roadmap
+
+For detailed future development plans, see [FUTURE_ROADMAP.md](docs/FUTURE_ROADMAP.md).
+
+### Short-Term Goals (1-3 months)
+1. **Complete Plugin System** - Framework designed, needs full implementation with .so plugin support
+2. **Load Balancing** - Multiple strategies (round-robin, least-connections) with health checks
+3. **Circuit Breaker** - Prevent cascading failures with automatic recovery
+
+### Medium-Term Goals (3-6 months)
+1. **Prometheus Metrics** - Comprehensive observability with Grafana dashboards
+2. **API Key Management API** - REST API for dynamic key management
+3. **Request Retry** - Automatic retry with exponential backoff
+
+### Long-Term Goals (6+ months)
+1. **Web Dashboard** - UI for monitoring and management
+2. **Service Discovery** - Integration with Consul and Kubernetes
+3. **WebSocket Support** - Proper WebSocket proxying and metrics
+4. **Advanced Security** - IP filtering, request signatures, CORS, security headers
+5. **Performance Optimization** - Connection pooling, HTTP/2, compression
+6. **Developer Experience** - Better tools, documentation, and examples
+
+See [IMPLEMENTATION_CHECKLIST.md](docs/IMPLEMENTATION_CHECKLIST.md) for a complete implementation checklist.
