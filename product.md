@@ -26,6 +26,8 @@ This is how real companies design systems:
 
 All use API gateways.
 
+**Current Status:** Phase 1 ✅ | Phase 2 ✅ | Phase 3.1 ✅ | Phase 3.2 ✅ (Plugin System) | Phase 3.3 🔜 (Infra & Observability)
+
 ---
 
 # ⚙️ Core Features of HydraGate
@@ -144,7 +146,7 @@ Everything passes through gateway first.
 
 # 🧱 Development Phases
 
-## 🟢 Phase 1 — Core Gateway Foundation
+## 🟢 Phase 1 — Core Gateway Foundation ✅ (Complete)
 
 Goal: basic gateway working
 
@@ -158,7 +160,7 @@ Features:
 
 ---
 
-## 🟡 Phase 2 — Production Features
+## 🟢 Phase 2 — Production Features ✅ (Complete)
 
 Goal: real backend engineering
 
@@ -173,19 +175,49 @@ Add:
 
 ---
 
-## 🔴 Phase 3 — Pro/Infra Level
+## 🟢 Phase 3.1 — Caching (Redis) ✅ (Complete)
+
+Goal: improve performance with intelligent caching
+
+Add:
+
+- Redis caching middleware
+- 3-layer cache configuration (global → route → path)
+- Smart cache key generation
+- User identity scoping for protected routes
+- Cache invalidation (delete by pattern, flush by prefix, flush all)
+- Graceful degradation on Redis failure
+
+---
+
+## 🟢 Phase 3.2 — Plugin System ✅ (Complete - March 8, 2026)
+
+Goal: extensible architecture for custom middleware
+
+Add:
+
+- 4-phase plugin lifecycle (PreRoute → PreUpstream → PostUpstream → PreResponse)
+- Plugin registry with external `.so` loading
+- Per-plugin timeout and priority ordering
+- ResponseCapture wrapper for response inspection/modification
+- Factory pattern for per-request instances
+- Built-in plugins: logger, rate_limiter, jwt_auth, api_key_auth
+- Hot-reload of plugin configuration
+
+---
+
+## 🔴 Phase 3.3 — Infra & Observability 🔜 (In Progress)
 
 Goal: elite backend project
 
 Add:
 
-- caching (Redis)
-- plugin system
-- load balancing
-- circuit breaker
+- load balancing (round-robin, weighted, least-connections)
+- health checks for backends
+- circuit breaker (prevents cascading failures)
 - metrics (Prometheus)
-- Docker setup
+- request retry mechanism
 - API key management (admin REST API + Redis-backed store)
-- optional dashboard
+- optional dashboard (long-term)
 
 ---
