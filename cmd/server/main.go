@@ -27,10 +27,12 @@ var rdb *redis.Client
 // mainHandler is swapped atomically on hot-reload.
 var mainHandler http.Handler
 
+// handlerHealth responds to health check requests with "Alive".
 func handlerHealth(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Alive")
 }
 
+// handlerReload returns a handler that manually reloads the configuration.
 func handlerReload(state *config.State, pluginRegistry *plugin.PluginRegistry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -60,12 +62,16 @@ func handlerReload(state *config.State, pluginRegistry *plugin.PluginRegistry) h
 
 // routePrefix extracts the first path segment (e.g. "api" from "/api/users").
 func routePrefix(r *http.Request) string {
+func routePrefix(r *http.Request) string {
 	trimmed := strings.TrimPrefix(r.URL.Path, "/")
 	prefix, _, _ := strings.Cut(trimmed, "/")
 	return prefix
 }
 
 // registerBuiltinPlugins registers all built-in plugin factories into the
+// provided registry. External plugins are loaded later via UpdateConfig when
+// the config's external_paths list is processed.
+func registerBuiltinPlugins(reg *plugin.PluginRegistry, rdbClient *redis.Client, state *config.State) {
 // provided registry. External plugins are loaded later via UpdateConfig when
 // the config's external_paths list is processed.
 func registerBuiltinPlugins(reg *plugin.PluginRegistry, rdbClient *redis.Client, state *config.State) {
@@ -99,6 +105,7 @@ func registerBuiltinPlugins(reg *plugin.PluginRegistry, rdbClient *redis.Client,
 	))
 }
 
+// buildMainHandler constructs the main HTTP handler with all middleware applied.
 func buildMainHandler(rdbClient *redis.Client, state *config.State) http.Handler {
 	cfg := state.GetConfig()
 	reg := state.GetRegistry()

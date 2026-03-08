@@ -10,6 +10,7 @@ import (
 	"hydragate/internal/proxy"
 )
 
+// ValidateConfig validates the gateway configuration.
 func ValidateConfig(cfg *app.GatewayConfig) error {
 	if cfg.JWTSecret == "" {
 		return fmt.Errorf("jwt_secret cannot be empty")
