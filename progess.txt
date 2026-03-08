@@ -9,3 +9,19 @@ Created API Key Auth : done
 Created Rate Limiter : done
 Created Config Reload: done
 Created Redis Cache  : done
+Created Plugin System (wired): done
+  - plugin/types.go       : Plugin interface, PluginContext, 4 phases
+  - plugin/registry.go    : factory registration, external .so loading
+  - plugin/executor.go    : phase execution, per-plugin timeout, priority sort
+  - plugin/middleware.go  : full 4-phase HTTP middleware (PreRoute → PreUpstream → PostUpstream → PreResponse → Flush)
+  - plugin/response.go    : ResponseCapture wrapper (buffers backend response)
+  - plugins/base.go       : BasePlugin with no-op defaults (embed to override only needed phases)
+  - plugins/logger.go     : LoggerPlugin (OnPreRoute + OnPreResponse)
+  - plugins/rate_limiter.go: RateLimiterPlugin (OnPreRoute, Redis token bucket)
+  - plugins/jwt_auth.go   : JWTAuthPlugin (OnPreUpstream, claim forwarding)
+  - plugins/api_key_auth.go: APIKeyAuthPlugin (OnPreUpstream, X-API-Key header)
+  - app/app.go            : PluginsConfig added to GatewayConfig
+  - config/state.go       : PluginExecutor stored in State (atomic swap)
+  - config/reload.go      : executor rebuilt on hot-reload
+  - config/watcher.go     : pluginRegistry threaded through to Reload
+  - cmd/server/main.go    : built-in plugins registered, executor wired into handler chain

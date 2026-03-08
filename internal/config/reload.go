@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"hydragate/internal/app"
+	"hydragate/internal/plugin"
 	"hydragate/internal/proxy"
 )
 
@@ -58,7 +59,12 @@ func ValidateConfig(cfg *app.GatewayConfig) error {
 	return nil
 }
 
-func Reload(state *State, configPath string) error {
+// Reload loads a fresh config from disk, validates it, rebuilds the route
+// registry and plugin executor, then atomically swaps all three into State.
+// The pluginRegistry is the already-initialised PluginRegistry that has all
+// built-in (and external) factories registered — it is reused across reloads
+// so external .so plugins do not need to be re-opened.
+func Reload(state *State, configPath string, pluginRegistry *plugin.PluginRegistry) error {
 	newCfg, err := LoadConfig(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
@@ -71,8 +77,16 @@ func Reload(state *State, configPath string) error {
 	newReg := proxy.NewRegistry()
 	newReg.LoadRoutes(newCfg.Routes)
 
+	newExec := plugin.NewExecutor(pluginRegistry)
+	if err := newExec.UpdateConfig(newCfg.Plugins); err != nil {
+		return fmt.Errorf("failed to update plugin config: %w", err)
+	}
+
+	// Swap all three atomically — config and registry first so that any
+	// concurrent request reading the executor sees a consistent view.
 	state.SetConfig(newCfg)
 	state.SetRegistry(newReg)
+	state.SetExecutor(newExec)
 
 	return nil
 }
