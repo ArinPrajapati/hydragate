@@ -1,3 +1,4 @@
+// Package plugins provides built-in implementations of the plugin interface.
 package plugins
 
 import (
