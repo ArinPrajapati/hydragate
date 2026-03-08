@@ -1,3 +1,4 @@
+// Package urlpath provides utilities for parsing and manipulating URL paths.
 package urlpath
 
 import (

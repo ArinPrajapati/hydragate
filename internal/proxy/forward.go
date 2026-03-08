@@ -1,3 +1,4 @@
+// Package proxy handles request forwarding to upstream services.
 package proxy
 
 import (

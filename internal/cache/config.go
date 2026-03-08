@@ -1,3 +1,4 @@
+// Package cache provides HTTP response caching middleware with Redis backend.
 package cache
 
 import (

@@ -1,3 +1,4 @@
+// Package app defines configuration structures for the Hydragate API Gateway.
 package app
 
 type TransformConfig struct {

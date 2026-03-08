@@ -1,3 +1,4 @@
+// Package auth provides JWT token generation and validation utilities.
 package auth
 
 import (
