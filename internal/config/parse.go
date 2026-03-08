@@ -1,3 +1,4 @@
+// Package config handles configuration loading, validation, and hot-reloading.
 package config
 
 import (
@@ -8,7 +9,8 @@ import (
 	"hydragate/internal/app"
 )
 
-func ParseConfig(FilePath string) (*app.GatewayConfig, error) {
+// ParseConfig reads and parses the gateway configuration from a JSON file.
+func ParseConfig(filePath string) (*app.GatewayConfig, error) {
 	data, err := os.ReadFile(FilePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
