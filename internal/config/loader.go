@@ -1,3 +1,4 @@
+// Package config handles configuration loading, validation, and hot-reloading.
 package config
 
 import (

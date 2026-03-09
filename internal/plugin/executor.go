@@ -1,3 +1,4 @@
+// Package plugin provides a plugin system for extending gateway functionality.
 package plugin
 
 import (
