@@ -4,10 +4,12 @@ import (
 	"log/slog"
 	"time"
 
+	"hydragate/internal/plugin"
+
 	"github.com/fsnotify/fsnotify"
 )
 
-func WatchConfig(configPath string, state *State) {
+func WatchConfig(configPath string, state *State, pluginRegistry *plugin.PluginRegistry) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		slog.Error("failed to create file watcher", "error", err)
@@ -37,7 +39,7 @@ func WatchConfig(configPath string, state *State) {
 				debounceTimer.Stop()
 				debounceTimer = time.AfterFunc(100*time.Millisecond, func() {
 					slog.Info("config file changed, reloading...", "path", configPath)
-					if err := Reload(state, configPath); err != nil {
+					if err := Reload(state, configPath, pluginRegistry); err != nil {
 						slog.Error("failed to reload config", "error", err)
 					} else {
 						slog.Info("config reloaded successfully")

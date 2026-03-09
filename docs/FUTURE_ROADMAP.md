@@ -158,6 +158,34 @@ HydraGate has successfully completed its core foundation, production-grade featu
 - Different strategies can be configured per route
 - Health checks work reliably
 
+**Configuration Example:**
+```json
+{
+  "routes": [
+    {
+      "route": "api",
+      "target": "http://backend-pool",
+      "load_balancer": {
+        "strategy": "round_robin",
+        "backends": [
+          { "url": "http://backend1:8001", "weight": 1 },
+          { "url": "http://backend2:8001", "weight": 1 },
+          { "url": "http://backend3:8001", "weight": 2 }
+        ],
+        "health_check": {
+          "enabled": true,
+          "path": "/health",
+          "interval_seconds": 10,
+          "unhealthy_threshold": 3,
+          "healthy_threshold": 2,
+          "timeout_seconds": 5
+        }
+      }
+    }
+  ]
+}
+```
+
 ---
 
 ### Priority 2: Circuit Breaker
@@ -205,6 +233,25 @@ HydraGate has successfully completed its core foundation, production-grade featu
 - No cascading failures during outages
 - Circuit breaker states observable via metrics
 
+**Configuration Example:**
+```json
+{
+  "routes": [
+    {
+      "route": "api",
+      "target": "http://backend1:8001",
+      "circuit_breaker": {
+        "enabled": true,
+        "failure_threshold": 5,
+        "success_threshold": 2,
+        "timeout_seconds": 60,
+        "half_open_max_calls": 3
+      }
+    }
+  ]
+}
+```
+
 ---
 
 ### Priority 3: Prometheus Metrics Integration
@@ -232,7 +279,6 @@ HydraGate has successfully completed its core foundation, production-grade featu
    - [ ] Rate limit violations
    - [ ] Circuit breaker state changes
    - [ ] Load balancer backend health
-   - [ ] Plugin execution time
 
 3. **Integrate with Prometheus** (1 week)
    - [ ] Add `/metrics` endpoint
@@ -258,6 +304,32 @@ HydraGate has successfully completed its core foundation, production-grade featu
 - Grafana dashboard displays meaningful data
 - Alerting rules provided for critical metrics
 - Plugin metrics properly integrated
+
+**Example Metrics:**
+```
+# Request metrics
+hydragate_http_requests_total{route="api", method="GET", status="200"} 1234
+hydragate_request_duration_seconds_bucket{route="api", le="0.1"} 456
+hydragate_request_duration_seconds_bucket{route="api", le="0.5"} 890
+hydragate_request_duration_seconds_sum{route="api"} 123.45
+hydragate_active_requests{route="api"} 12
+
+# Cache metrics
+hydragate_cache_hits_total{route="api"} 567
+hydragate_cache_misses_total{route="api"} 890
+hydragate_cache_hit_ratio{route="api"} 0.389
+
+# Rate limiting
+hydragate_rate_limit_violations_total{route="api"} 45
+
+# Circuit breaker
+hydragate_circuit_breaker_state{route="api", backend="backend1", state="closed"} 1
+hydragate_circuit_breaker_state{route="api", backend="backend1", state="open"} 0
+
+# Load balancer
+hydragate_backend_up{route="api", backend="backend1"} 1
+hydragate_backend_up{route="api", backend="backend2"} 0
+```
 
 ---
 
@@ -312,6 +384,26 @@ HydraGate has successfully completed its core foundation, production-grade featu
 - Audit logs capture all admin operations
 - Backward compatibility maintained
 
+**API Example:**
+```json
+# Create API key
+POST /admin/api-keys
+{
+  "name": "production-service",
+  "scopes": ["read", "write"],
+  "rate_limit": {
+    "requests_per_minute": 1000
+  }
+}
+
+Response:
+{
+  "id": "ak_123456",
+  "key": "sk_live_...",
+  "created_at": "2026-03-08T12:00:00Z"
+}
+```
+
 ---
 
 ### Priority 2: Request Retry Mechanism
@@ -359,6 +451,30 @@ HydraGate has successfully completed its core foundation, production-grade featu
 - Non-idempotent requests not retried by default
 - Circuit breaker respected during retries
 - Retry metrics visible in Prometheus
+
+**Configuration Example:**
+```json
+{
+  "routes": [
+    {
+      "route": "api",
+      "retry": {
+        "enabled": true,
+        "max_attempts": 3,
+        "backoff": {
+          "type": "exponential",
+          "initial_delay_ms": 100,
+          "max_delay_ms": 5000,
+          "multiplier": 2,
+          "jitter": true
+        },
+        "retryable_statuses": [502, 503, 504],
+        "retryable_methods": ["GET", "HEAD", "PUT", "DELETE"]
+      }
+    }
+  ]
+}
+```
 
 ---
 

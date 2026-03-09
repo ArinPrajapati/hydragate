@@ -26,6 +26,54 @@
     },
     "max_size": 1048576
   },
+  "plugins": {
+    "external_paths": [],
+    "global": [
+      {
+        "name": "logger",
+        "enabled": true,
+        "priority": 100,
+        "timeout_ms": 5000,
+        "on_error": "continue"
+      },
+      {
+        "name": "rate_limiter",
+        "enabled": true,
+        "priority": 50,
+        "timeout_ms": 2000,
+        "on_error": "abort"
+      }
+    ],
+    "routes": {
+      "api": [
+        {
+          "name": "api_key_auth",
+          "enabled": false,
+          "priority": 10,
+          "timeout_ms": 1000,
+          "on_error": "abort"
+        },
+        {
+          "name": "jwt_auth",
+          "enabled": false,
+          "priority": 20,
+          "timeout_ms": 1000,
+          "on_error": "abort"
+        }
+      ]
+    },
+    "config": {
+      "logger": {
+        "level": "info"
+      },
+      "rate_limiter": {
+        "capacity": 15,
+        "refill_rate": 100
+      },
+      "api_key_auth": {},
+      "jwt_auth": {}
+    }
+  },
   "routes": [
     {
       "route": "api",
